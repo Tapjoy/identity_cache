@@ -135,7 +135,7 @@ module IdentityCache
         elsif (reflection = record.class.reflect_on_association(association_name)).collection?
           association = reflection.association_class.new(record, reflection)
           association.target = coder_or_array.map {|e| record_from_coder(e) }
-          association.target.each {|e| association.set_inverse_instance(e, reflection) }
+          association.target.each {|e| set_inverse_instance(e, reflection) }
           #association.proxy
         else
           record_from_coder(coder_or_array)
@@ -158,7 +158,7 @@ module IdentityCache
       def coder_from_record(record) #:nodoc:
         unless record.nil?
           coder = {:class => record.class }
-          record.encode_with(coder)
+          coder['attributes'] = record.attributes
           add_cached_associations_to_coder(record, coder)
           coder
         end

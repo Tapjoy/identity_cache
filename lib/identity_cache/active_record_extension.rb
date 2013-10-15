@@ -21,7 +21,6 @@ module ActiveRecord
 end
 
 module ActiveRecord
-  # = Active Record Reflection
   module Reflection # :nodoc:
     extend ActiveSupport::Concern
 
@@ -48,6 +47,18 @@ module ActiveRecord
     extend ActiveSupport::Concern
 
     attr_reader :association_cache
+
+    def association(name) #:nodoc:
+      association = association_instance_get(name)
+
+      if association.nil?
+        reflection  = self.class.reflect_on_association(name)
+        association = reflection.association_class.new(self, reflection)
+        association_instance_set(name, association)
+      end
+
+      association
+    end
 
     private
       # Set the specified association instance.
