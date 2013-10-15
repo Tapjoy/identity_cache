@@ -65,8 +65,8 @@ class FetchMultiWithBatchedAssociationsTest < IdentityCache::TestCase
 
     assert_memcache_operations(2) do
       @cached_bob, @cached_joe = Record.fetch_multi(@bob.id, @joe.id, :includes => :associated_records)
-      assert_equal child_records[0..2].sort, @cached_bob.fetch_associated_records.sort
-      assert_equal child_records[3..5].sort, @cached_joe.fetch_associated_records.sort
+      assert (child_records[0..2] - @cached_bob.fetch_associated_records).empty?
+      assert (child_records[3..5] - @cached_joe.fetch_associated_records).empty?
     end
   end
 
@@ -110,15 +110,17 @@ class FetchMultiWithBatchedAssociationsTest < IdentityCache::TestCase
 
     assert_memcache_operations(3) do
       @cached_bob, @cached_joe = Record.fetch_multi(@bob.id, @joe.id, :includes => {:associated_records => :deeply_associated_records})
-      bob_children = @cached_bob.fetch_associated_records.sort
-      joe_children = @cached_joe.fetch_associated_records.sort
+      bob_children = @cached_bob.fetch_associated_records
+      joe_children = @cached_joe.fetch_associated_records
+      bob_children.sort! { |a,b| a.id <=> b.id }
+      joe_children.sort! { |a,b| a.id <=> b.id }
 
-      assert_equal grandchildren[0..2].sort,   bob_children[0].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[3..5].sort,   bob_children[1].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[6..8].sort,   bob_children[2].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[9..11].sort,  joe_children[0].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[12..14].sort, joe_children[1].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[15..17].sort, joe_children[2].fetch_deeply_associated_records.sort
+      assert (grandchildren[0..2] - bob_children[0].fetch_deeply_associated_records).empty?
+      assert (grandchildren[3..5] - bob_children[1].fetch_deeply_associated_records).empty?
+      assert (grandchildren[6..8] - bob_children[2].fetch_deeply_associated_records).empty?
+      assert (grandchildren[9..11] - joe_children[0].fetch_deeply_associated_records).empty?
+      assert (grandchildren[12..14] - joe_children[1].fetch_deeply_associated_records).empty?
+      assert (grandchildren[15..17] - joe_children[2].fetch_deeply_associated_records).empty?
     end
   end
 
@@ -165,15 +167,17 @@ class FetchMultiWithBatchedAssociationsTest < IdentityCache::TestCase
 
     assert_memcache_operations(2) do
       @cached_bob, @cached_joe = Record.fetch_multi(@bob.id, @joe.id, :includes => {:associated_records => :deeply_associated_records})
-      bob_children = @cached_bob.fetch_associated_records.sort
-      joe_children = @cached_joe.fetch_associated_records.sort
+      bob_children = @cached_bob.fetch_associated_records
+      joe_children = @cached_joe.fetch_associated_records
+      bob_children.sort! { |a,b| a.id <=> b.id }
+      joe_children.sort! { |a,b| a.id <=> b.id }
 
-      assert_equal grandchildren[0..2].sort,   bob_children[0].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[3..5].sort,   bob_children[1].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[6..8].sort,   bob_children[2].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[9..11].sort,  joe_children[0].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[12..14].sort, joe_children[1].fetch_deeply_associated_records.sort
-      assert_equal grandchildren[15..17].sort, joe_children[2].fetch_deeply_associated_records.sort
+      assert (grandchildren[0..2] - bob_children[0].fetch_deeply_associated_records).empty?
+      assert (grandchildren[3..5] - bob_children[1].fetch_deeply_associated_records).empty?
+      assert (grandchildren[6..8] - bob_children[2].fetch_deeply_associated_records).empty?
+      assert (grandchildren[9..11] - joe_children[0].fetch_deeply_associated_records).empty?
+      assert (grandchildren[12..14] - joe_children[1].fetch_deeply_associated_records).empty?
+      assert (grandchildren[15..17] - joe_children[2].fetch_deeply_associated_records).empty?
     end
   end
 
@@ -193,8 +197,8 @@ class FetchMultiWithBatchedAssociationsTest < IdentityCache::TestCase
       bob_child = @cached_bob.fetch_associated
       joe_child = @cached_joe.fetch_associated
 
-      assert_equal grandchildren[0..2].sort,   bob_child.fetch_deeply_associated_records.sort
-      assert_equal grandchildren[3..5].sort,   joe_child.fetch_deeply_associated_records.sort
+      assert (grandchildren[0..2] - bob_child.fetch_deeply_associated_records).empty?
+      assert (grandchildren[3..5] - joe_child.fetch_deeply_associated_records).empty?
     end
   end
 
