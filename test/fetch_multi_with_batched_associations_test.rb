@@ -181,8 +181,8 @@ class FetchMultiWithBatchedAssociationsTest < IdentityCache::TestCase
     Record.send(:cache_has_one, :associated, :embed => true)
     AssociatedRecord.send(:cache_has_many, :deeply_associated_records, :embed => false)
 
-    @bob_child = @bob.create_associated!(:name => "bob child")
-    @joe_child = @joe.create_associated!(:name => "joe child")
+    @bob_child = AssociatedRecord.create!(:name => "bob child", :record => @bob)
+    @joe_child = AssociatedRecord.create!(:name => "joe child", :record => @joe)
 
     grandchildren = setup_grandchildren(@bob_child, @joe_child)
     AssociatedRecord.fetch_multi(@bob_child.id, @joe_child.id)
